@@ -18,18 +18,26 @@ App::App()
     }
 
 
+    //testing text input
+    // textArea = new TextArea(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer);
+    textArea = std::make_unique<TextArea>(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer);
+
+    SDL_StartTextInput(window);
+
 }
 
 App::~App()
 {
+    SDL_StopTextInput(window); //temp
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
 
 
-void App::Run()
+void App::run()
 {
+
 
     while(running)
     {
@@ -39,11 +47,26 @@ void App::Run()
             if (event.type == SDL_EVENT_QUIT) {
                 running = false;
             }
+            if(event.type == SDL_EVENT_TEXT_INPUT)
+            {
+                // handleInput();
+            }
         }
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
+
+        render();
     }
 }
 
+void App::render()
+{
 
+    SDL_SetRenderDrawColor(renderer,bgColor.r,bgColor.g,bgColor.b,bgColor.a);
+    SDL_RenderClear(renderer);
 
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+    textArea->update(w,h);
+
+    SDL_RenderPresent(renderer);
+
+}
