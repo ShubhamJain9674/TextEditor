@@ -50,6 +50,9 @@ void App::run()
             if(event.type == SDL_EVENT_TEXT_INPUT)
             {
                 // handleInput();
+                int w, h;
+                SDL_GetWindowSize(window, &w, &h);
+                textArea->update(w,h,event.text.text);
             }
         }
 
@@ -63,9 +66,7 @@ void App::render()
     SDL_SetRenderDrawColor(renderer,bgColor.r,bgColor.g,bgColor.b,bgColor.a);
     SDL_RenderClear(renderer);
 
-    int w, h;
-    SDL_GetWindowSize(window, &w, &h);
-    textArea->update(w,h);
+    textArea->render();
 
     SDL_RenderPresent(renderer);
 

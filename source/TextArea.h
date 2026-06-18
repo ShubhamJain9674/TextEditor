@@ -2,7 +2,8 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-
+#include <unordered_map>
+#include <string>
 
 /*
 This class will hold all functionality of Text area such as
@@ -14,23 +15,37 @@ This class will hold all functionality of Text area such as
 class TextArea
 {
 public:
-    TextArea(int x,int y,int w,int h,SDL_Renderer* renderer);
+    TextArea(float x,float y,float w,float h,SDL_Renderer* renderer);
 
-    void update(int w,int h);
+    void update(int w,int h,const char* txt);
+    void render();
 
 private:
-    SDL_FRect m_rect;
-    SDL_Renderer* m_renderer;
-
-    Uint16 m_font_size = 18;
+    SDL_Texture* getCharacterTexture(char ch);
 
 
+private:
+    SDL_FRect rect;
+    SDL_Renderer* renderer;
+
+    int fontSize = 18;
 
 
-    //placeholder string;
+    TTF_Font* font = nullptr;
+    SDL_Color txtColor = { 255, 255, 255, SDL_ALPHA_OPAQUE };
 
-    SDL_Texture *m_txt_texture = nullptr;
-    TTF_Font* m_font = nullptr;
-    SDL_Color m_txt_color = { 255, 255, 255, SDL_ALPHA_OPAQUE };
-    SDL_Surface *m_txt_surface;
+
+    // note using char as glyph cache instead of custom data structure for simplicity.
+    // repopulate glyph cache on change of attributes like size font etc.
+    // otherwise requires a seperate data structure to mantain cache holding all the properties
+
+
+    std::unordered_map<char,SDL_Texture*> glyphCache;
+
+    //placeholder string holding the text;
+    std::string text;
+
 };
+
+
+
