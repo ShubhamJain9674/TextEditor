@@ -44,19 +44,30 @@ void TextArea::render()
     for(int i = 0; i < text.size(); i++)
     {
         SDL_Texture* tex = getCharacterTexture(text[i]);
+        int posx = 10;
+        int posy = 10;
         if(tex)
         {
             int w,h;
-            const float scale = 4.0f;
             SDL_FRect dest;
-            SDL_GetCurrentRenderOutputSize(renderer,&w,&h);
-            SDL_SetRenderScale(renderer,scale,scale);
+            float scalex,scaley;
+            SDL_GetRenderScale(renderer,&scalex,&scaley);
+            SDL_Log("%f %f",scalex,scaley);
+            SDL_SetRenderScale(renderer,2.0f,2.0f);
             SDL_GetTextureSize(tex,&dest.w,&dest.h);
 
-            dest.x = ((w / scale) - dest.w) / 2;
-            dest.y = ((h / scale) - dest.h) / 2;
+            dest.x = posx;
+            dest.y = posy;
+            posx += dest.w;
 
-            SDL_RenderTexture(renderer, tex, NULL,&dest);
+            if(posx == 1100){
+                posx = 10;
+                posy = dest.h;
+            }
+
+            SDL_RenderTexture(renderer, tex, NULL,NULL);
+            SDL_SetRenderScale(renderer,scalex,scaley);
+
         }
     }
     SDL_SetRenderDrawColor(renderer,r,g,b,a);
