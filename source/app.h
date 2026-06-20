@@ -4,7 +4,10 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
+
 #include <memory>
+#include <cstring>
+
 
 
 #include "TextArea.h"
@@ -34,3 +37,6 @@ private:
     std::unique_ptr<TextArea> textArea;
     SDL_Color bgColor = { 0,0,0,255 };
 };
+
+
+

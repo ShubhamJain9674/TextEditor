@@ -19,7 +19,6 @@ App::App()
 
 
     //testing text input
-    // textArea = new TextArea(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer);
     textArea = std::make_unique<TextArea>(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer);
 
     SDL_StartTextInput(window);
@@ -50,11 +49,15 @@ void App::run()
             if(event.type == SDL_EVENT_TEXT_INPUT)
             {
                 // handleInput();
-                int w, h;
-                SDL_GetWindowSize(window, &w, &h);
-                textArea->update(w,h,event.text.text);
+
+                size_t lastIndex = std::strlen(event.text.text) - 1;
+                textArea->addChar(event.text.text[lastIndex]);
             }
         }
+
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+        textArea->update(w,h);
 
         render();
     }

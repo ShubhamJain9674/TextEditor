@@ -17,7 +17,8 @@ class TextArea
 public:
     TextArea(float x,float y,float w,float h,SDL_Renderer* renderer);
 
-    void update(int w,int h,const char* txt);
+    void update(int w,int h);
+    void addChar(char ch);
     void render();
 
 private:
@@ -25,14 +26,31 @@ private:
 
 
 private:
+
     SDL_FRect rect;
     SDL_Renderer* renderer;
 
-    int fontSize = 18;
 
 
-    TTF_Font* font = nullptr;
-    SDL_Color txtColor = { 255, 255, 255, SDL_ALPHA_OPAQUE };
+
+
+    // text formatting attributes:-
+
+    Uint16 padx = 10;     // boundary padding x
+    Uint16 pady = 10;     // boundary padding y
+
+
+    TTF_Font*   font          = nullptr;
+    Uint16      fontSize      = 18;
+    SDL_Color   txtColor      = { 255, 255, 255, SDL_ALPHA_OPAQUE };
+    float       charSpacing   = 1.0f;                                            // inter character spacing.
+    float       linePadding   = 0.5f;
+
+
+    // Editor setup attributes
+    const Uint16 textAreaStart = 0;
+
+
 
 
     // note using char as glyph cache instead of custom data structure for simplicity.

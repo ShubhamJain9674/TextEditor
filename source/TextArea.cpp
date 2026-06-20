@@ -19,15 +19,17 @@ TextArea::TextArea(float x,float y,float w,float h,SDL_Renderer* renderer)
 
 }
 
-void TextArea::update(int w,int h,const char* txt)
+void TextArea::addChar(char ch)
+{
+    text += ch;
+    SDL_Log(text.c_str());
+}
+
+void TextArea::update(int w,int h)
 {
     // recalibrate dims
     rect.w = w;
     rect.h = h;
-
-    text+=txt;
-
-
 }
 
 void TextArea::render()
@@ -40,34 +42,29 @@ void TextArea::render()
 
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
     SDL_RenderRect(renderer,&rect);
-
-    for(int i = 0; i < text.size(); i++)
+    int posx = textAreaStart + padx;
+    int posy = textAreaStart + pady;
+    for(size_t i = 0; i < text.size(); i++)
     {
         SDL_Texture* tex = getCharacterTexture(text[i]);
-        int posx = 10;
-        int posy = 10;
+
         if(tex)
         {
-            int w,h;
-            SDL_FRect dest;
-            float scalex,scaley;
-            SDL_GetRenderScale(renderer,&scalex,&scaley);
-            SDL_Log("%f %f",scalex,scaley);
-            SDL_SetRenderScale(renderer,2.0f,2.0f);
-            SDL_GetTextureSize(tex,&dest.w,&dest.h);
+            SDL_FRect charRect;
 
-            dest.x = posx;
-            dest.y = posy;
-            posx += dest.w;
+            SDL_GetTextureSize(tex,&charRect.w,&charRect.h);
 
-            if(posx == 1100){
-                posx = 10;
-                posy = dest.h;
+            if( (posx + charRect.w) >= (rect.w - padx) ){
+                posx = textAreaStart;
+                posy+= charRect.h;
             }
+            else
+                posx += charRect.w;
 
-            SDL_RenderTexture(renderer, tex, NULL,NULL);
-            SDL_SetRenderScale(renderer,scalex,scaley);
+            charRect.x = posx;
+            charRect.y = posy;
 
+            SDL_RenderTexture(renderer, tex,NULL,&charRect);
         }
     }
     SDL_SetRenderDrawColor(renderer,r,g,b,a);
@@ -80,8 +77,9 @@ SDL_Texture* TextArea::getCharacterTexture(char ch)
     if(glyphCache.find(ch) == glyphCache.end())
     {
         SDL_Texture *glTexture = nullptr;
+        char temp[2] = { ch, '\0' };
 
-        SDL_Surface *txtSurface = TTF_RenderText_Blended(this->font,text.c_str(), 0, txtColor);
+        SDL_Surface *txtSurface = TTF_RenderText_Blended(this->font,temp, 0, txtColor);
         if (txtSurface) {
             glTexture = SDL_CreateTextureFromSurface(renderer, txtSurface);
             SDL_DestroySurface(txtSurface);
