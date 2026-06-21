@@ -51,20 +51,20 @@ void TextArea::render()
         if(tex)
         {
             SDL_FRect charRect;
-
             SDL_GetTextureSize(tex,&charRect.w,&charRect.h);
-
-            if( (posx + charRect.w) >= (rect.w - padx) ){
-                posx = textAreaStart;
-                posy+= charRect.h;
-            }
-            else
-                posx += charRect.w;
-
             charRect.x = posx;
             charRect.y = posy;
-
             SDL_RenderTexture(renderer, tex,NULL,&charRect);
+
+
+            if( (posx + charRect.w) >= textAreaStart + (rect.w - padx) ){
+                posx = textAreaStart;
+                posy = (linePadding > charRect.h)? linePadding : charRect.h;
+            }
+            else
+                posx += charRect.w + charSpacing;
+
+
         }
     }
     SDL_SetRenderDrawColor(renderer,r,g,b,a);

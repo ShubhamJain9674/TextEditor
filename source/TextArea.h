@@ -43,8 +43,8 @@ private:
     TTF_Font*   font          = nullptr;
     Uint16      fontSize      = 18;
     SDL_Color   txtColor      = { 255, 255, 255, SDL_ALPHA_OPAQUE };
-    float       charSpacing   = 1.0f;                                            // inter character spacing.
-    float       linePadding   = 0.5f;
+    float       charSpacing   = 0.75f;                                      // inter character spacing.
+    float       linePadding   = 0.5f;                                       // inter line spacing
 
 
     // Editor setup attributes
