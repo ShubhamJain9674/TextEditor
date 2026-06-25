@@ -55,7 +55,6 @@ std::string GapBuffer::ToString()
         else
             text += buffer[i];
     }
-
     return text;
 }
 
@@ -165,8 +164,8 @@ void GapBuffer::MoveCursor(int direction,int amount = 1)
         {
             if(textEnd + 1 == size)
                 Grow();
-            else
-                cursor = textEnd + 1;
+
+            cursor = textEnd + 1;
         }
         else
         {
@@ -180,11 +179,17 @@ void GapBuffer::MoveCursor(int direction,int amount = 1)
     MoveGap();
 }
 
+
+
 void GapBuffer::SetCursorPos(int pos)
 {
     int textEnd = GetTextEnd();
     if(pos > textEnd)
-        pos = textEnd;
+    {
+        if(textEnd+1 == size)
+            Grow();
+        pos = textEnd + 1;
+    }
     else if(pos < 0)
         pos = GetTextStart();
     else if(pos >= gapStart && pos <= gapEnd)  // can this be abstracted out into function getRelative pos
@@ -257,7 +262,6 @@ void GapBuffer::MoveGap()
         // int steps = cursor - firstIndex + 1;
 
         int steps = cursor - firstIndex;
-
         for(int i = 0;i < steps;i++)
         {
             buffer[gapStart] = buffer[firstIndex];

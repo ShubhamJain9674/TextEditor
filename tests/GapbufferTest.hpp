@@ -1,8 +1,100 @@
 #pragma once
 
 #include "gapbuffer.h"
-
+#include <cstdlib>
+#include <string>
+#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
+
+
+TEST_CASE("Char insertion at cursor Tests")
+{
+    GapBuffer buffer;
+
+    // Single Insert;
+    buffer.InsertAtCursor('H');
+    CHECK(buffer.ToString() == "H");
+
+    // Multiple Insertion;
+    buffer.InsertAtCursor('E');
+    buffer.InsertAtCursor('L');
+    buffer.InsertAtCursor('L');
+    buffer.InsertAtCursor('O');
+
+    const std::string test = "HELLO";
+
+    CHECK(buffer.ToString() =="HELLO");
+
+    std::string check(BUFFER_SIZE,'\0');
+    for(int i = 0;i < test.size();i++)
+    {
+        check[i] = test[i];
+    }
+
+    REQUIRE(buffer.GetMemorySnapshot() == check);
+
+}
+
+
+
+TEST_CASE("Text Insertion and Cursor Movement function")
+{
+
+    GapBuffer buffer;
+
+    // Insertion at start
+
+    std::string test1 = "Hello World!";
+    buffer.InsertText(test1);
+    CHECK(buffer.ToString() == test1);
+
+    // Move Left
+    int testTextSize = test1.size();
+
+    buffer.MoveCursor(CURSOR_MOVE_LEFT,6);
+    // although buffer indexing start from 0 cursor is expected to be +1 pos ahead of last char of test1
+    CHECK(buffer.GetAbsoluteCursorPos() == testTextSize - 6);
+    CHECK(buffer.GetAbsoluteCursorPos() == buffer.GetGapStart());
+
+    // Insert Text in between
+
+    // Single Character
+    buffer.InsertAtCursor('B');
+    CHECK(buffer.ToString() == "Hello BWorld!");
+
+    buffer.InsertText("ig ");
+    CHECK(buffer.ToString() == "Hello Big World!");
+
+
+    // Insert More than characters.
+    CHECK(buffer.GetBufferSize() == BUFFER_SIZE);
+    buffer.InsertText("Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien ");
+    CHECK(buffer.ToString() == "Hello Big Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien World!");
+    REQUIRE(buffer.GetBufferSize() == BUFFER_SIZE + BUFFER_GROW_SIZE);
+
+    buffer.MoveCursor(CURSOR_MOVE_RIGHT,20);
+
+    REQUIRE(buffer.GetAbsoluteCursorPos() == buffer.GetTextEnd() + 1);
+    REQUIRE(buffer.GetBufferSize() == BUFFER_SIZE + 2 * BUFFER_GROW_SIZE);
+
+    // Go Back and insert in between
+    buffer.SetCursorPos(0);
+    REQUIRE(buffer.GetAbsoluteCursorPos() == 0);
+    REQUIRE(buffer.GetGapStart() == 0);
+
+    buffer.MoveCursor(CURSOR_MOVE_RIGHT,6);
+    // if i set pos as 0 the cursor should be before the 1st char in text; that mean cursor is representatively at -1
+
+
+    REQUIRE(buffer.GetAbsoluteCursorPos() == 5);
+    CHECK(buffer.GetAbsoluteCursorPos() == buffer.GetGapStart());
+    buffer.InsertText(" Big ");
+
+    CHECK(buffer.ToString() == "Hello Big  Big Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien World!");
+    // after crazy thinking the conclusion is the mental model to keep in mind if cursor is set at pos(4) it is before the character 4 so
+    // cursor abs pos = 4 but the character at 4 is shifted to 5 but the string pos of char at 5 is still 4.(CRAZY HUH)
+}
+
 
 
 /*

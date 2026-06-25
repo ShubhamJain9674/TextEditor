@@ -42,10 +42,32 @@ public:
 
     char CharAt(int pos);
 
+
+
+
+#ifndef NDEBUG
+
+    std::string GetMemorySnapshot();
+
+    int GetAbsoluteCursorPos() { return cursor; }
+
+    char GetValueAtAbsPos(int cursor);
+
+    int GetGapStart() { return gapStart; }
+
+    int GetGapEnd() { return gapEnd; }
+
+    bool IsInGapDebug(int pos) { return IsInGap(pos); }
+
+    int GetBufferSize() { return size; }
+
+#endif
+
 protected:
 
     void Grow();
     void MoveGap();
+
 
 private:
     inline bool IsInGap(int pos)
@@ -59,3 +81,21 @@ private:
     int cursor;
     int size;
 };
+
+#ifndef NDEBUG
+
+std::string GapBuffer::GetMemorySnapshot()
+{
+    std::string memorySnap = "";
+
+    for(int i = 0;i < size;i++)
+    {
+        memorySnap += buffer[i];
+    }
+
+    return memorySnap;
+}
+
+
+
+#endif
