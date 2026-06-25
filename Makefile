@@ -1,12 +1,27 @@
-.PHONY: debug release clean
+.PHONY: debug release test run clean
+
+DEBUG_DIR := build/debug
+RELEASE_DIR := build/release
 
 debug:
-	cmake -B build/debug -DCMAKE_BUILD_TYPE=Debug
-	cmake --build build/debug
+	cmake -S . -B $(DEBUG_DIR) \
+		-DCMAKE_BUILD_TYPE=Debug \
+		-DTEXTEDITOR_BUILD_TESTS=ON
+	cmake --build $(DEBUG_DIR)
 
 release:
-	cmake -B build/release -DCMAKE_BUILD_TYPE=Release
-	cmake --build build/release
+	cmake -S . -B $(RELEASE_DIR) \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DTEXTEDITOR_BUILD_TESTS=OFF
+	cmake --build $(RELEASE_DIR)
+
+test:
+	cmake --build $(DEBUG_DIR)
+	./$(DEBUG_DIR)/tests/EditorTests
+
+run:
+	cmake --build $(DEBUG_DIR)
+	./$(DEBUG_DIR)/TextEditor
 
 clean:
 	rm -rf build

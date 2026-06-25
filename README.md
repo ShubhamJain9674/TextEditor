@@ -39,3 +39,12 @@ cross-platform Text Editor program
 cmake -B build
 cmake --build build
 ```
+
+## Third-Party Libraries
+
+This project uses the following third-party software:
+
+- Catch2 (Boost Software License 1.0)
+- SDL (zlib License)
+
+See the LICENSES directory for full license texts.
