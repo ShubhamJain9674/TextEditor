@@ -1,11 +1,19 @@
 #pragma once
 
 #include "gapbuffer.h"
-#include <cstdlib>
 #include <string>
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators_all.hpp>
 
+/*
+Refactor Test Cases :-
+- Complete Testing
+- Test Correctly : Know what right answer look like
+- Test Validity : No circular logic (you shouldnt need to write tests for tests ) or unfalsifiable tests
+- Unit Tests must be correct by inspection.
+- use behaviour driven testing : test for expected behaviour where its difficult to get source for expected output.
+*/
 
 TEST_CASE("Char insertion at cursor Tests")
 {
@@ -53,8 +61,8 @@ TEST_CASE("Text Insertion and Cursor Movement function")
 
     buffer.MoveCursor(CURSOR_MOVE_LEFT,6);
     // although buffer indexing start from 0 cursor is expected to be +1 pos ahead of last char of test1
-    CHECK(buffer.GetAbsoluteCursorPos() == testTextSize - 6);
-    CHECK(buffer.GetAbsoluteCursorPos() == buffer.GetGapStart());
+    CHECK(buffer.GetAbsCursorPos() == testTextSize - 6);
+    CHECK(buffer.GetAbsCursorPos() == buffer.GetGapStart());
 
     // Insert Text in between
 
@@ -74,20 +82,20 @@ TEST_CASE("Text Insertion and Cursor Movement function")
 
     buffer.MoveCursor(CURSOR_MOVE_RIGHT,20);
 
-    REQUIRE(buffer.GetAbsoluteCursorPos() == buffer.GetTextEnd() + 1);
+    REQUIRE(buffer.GetAbsCursorPos() == buffer.GetAbsTextEnd() + 1);
     REQUIRE(buffer.GetBufferSize() == BUFFER_SIZE + 2 * BUFFER_GROW_SIZE);
 
     // Go Back and insert in between
     buffer.SetCursorPos(0);
-    REQUIRE(buffer.GetAbsoluteCursorPos() == 0);
+    REQUIRE(buffer.GetAbsCursorPos() == 0);
     REQUIRE(buffer.GetGapStart() == 0);
 
     buffer.MoveCursor(CURSOR_MOVE_RIGHT,6);
     // if i set pos as 0 the cursor should be before the 1st char in text; that mean cursor is representatively at -1
 
 
-    REQUIRE(buffer.GetAbsoluteCursorPos() == 5);
-    CHECK(buffer.GetAbsoluteCursorPos() == buffer.GetGapStart());
+    REQUIRE(buffer.GetAbsCursorPos() == 5);
+    CHECK(buffer.GetAbsCursorPos() == buffer.GetGapStart());
     buffer.InsertText(" Big ");
 
     CHECK(buffer.ToString() == "Hello Big  Big Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien World!");
@@ -95,199 +103,226 @@ TEST_CASE("Text Insertion and Cursor Movement function")
     // cursor abs pos = 4 but the character at 4 is shifted to 5 but the string pos of char at 5 is still 4.(CRAZY HUH)
 }
 
-
-
-/*
-
-void TestSimple(GapBuffer& buffer)
+TEST_CASE("Check CharAt")
 {
 
-    // insert at start;
-    buffer.InsertText("Hello World!");
-    buffer.DisplayContent();
+    GapBuffer buffer;
+    // accessing unassigned
+    CHECK(buffer.CharAt(10) == '\0');
 
-    // Move Left;
-    buffer.MoveCursor(CURSOR_MOVE_LEFT,6);
+    // Checking bunch of random values
 
-    // Insert text in between.
-    // single char
-    buffer.InsertAtCursor('B');
-    //requires buffer movement.
-    buffer.InsertText("ig ");
-    buffer.DisplayContent();
+    std::string test = "Hello World!";
+    buffer.InsertText(test.c_str());
 
-    //add more than 50 character so buffer needs to grow.
+    std::string control(BUFFER_SIZE,'\0');
+    for(int i = 0; i < test.size();i++)
+    {
+        control[i] = test[i];
+    }
 
-    buffer.InsertText("Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien");
-    buffer.DisplayContent();
+    // domain check
+    SECTION("Domain Check")
+    {
+        auto indexes = GENERATE(take(50,random(0,BUFFER_SIZE - 1)));
+        REQUIRE(buffer.CharAt(indexes) == control[indexes]);
+    }
 
-    //testing space insertion when moving right;
-    buffer.MoveCursor(CURSOR_MOVE_RIGHT,20);
+    // negative check
+    SECTION("Negative Check")
+    {
+        auto indexes2 = GENERATE(take(50,random(- BUFFER_SIZE,-1)));
+        REQUIRE(buffer.CharAt(indexes2) == '\0');
+    }
 
-    // testing large text
-    buffer.InsertText("Lorem ipsum dolor sit amet consectetur adipiscing elit quisque \
-faucibus ex sapien vitae pellentesque sem placerat in id cursus mi pretium tellus \
-duis convallis tempus leo eu aenean sed diam urna tempor pulvinar vivamus fringilla.");
-
-
-    buffer.DisplayContent();
-
-    // going back and inserting in between.
-
-    buffer.SetCursorPos(0);
-    buffer.MoveCursor(CURSOR_MOVE_RIGHT,6);
-    buffer.InsertText(" Big ");
-    buffer.DisplayContent();
+    // upper boundary check
+   SECTION("Upper Boundary Check")
+   {
+       auto indexes3 = GENERATE(take(50,random(BUFFER_SIZE,BUFFER_SIZE * 2)));
+       REQUIRE(buffer.CharAt(indexes3) == '\0');
+   }
 }
 
-void TestBufferMoveRight(GapBuffer& buffer)
+
+TEST_CASE("Gap Movement")
 {
+    // simple sanity check
+    GapBuffer buffer;
     buffer.InsertText("Hello World!");
-    buffer.DisplayContent();
+    CHECK(buffer.GetAbsCursorPos() == buffer.GetGapStart());
+
+    // buffer movement left
+
     buffer.SetCursorPos(0);
+    CHECK(buffer.GetAbsCursorPos() == buffer.GetGapStart());
+    CHECK(buffer.GetGapStart() == 0);
+    CHECK(buffer.CharAt(buffer.GetGapEnd()+1) == 'H');
+
+    // Insert text gap moves in between
     buffer.InsertText("Hello");
-    buffer.DisplayContent();
-    buffer.SetCursorPos(buffer.GetTextEnd());
+    CHECK(buffer.GetAbsCursorPos() == buffer.GetGapStart());
+
+    // Inset text at the end gap moves at the end towards right
+    buffer.SetCursorPos(buffer.GetAbsTextEnd()+1);
     buffer.InsertText(" WORLD ");
-    buffer.DisplayContent();
+    CHECK(buffer.ToString() == "HelloHello World! WORLD ");
+    CHECK(buffer.GetAbsTextEnd()+1 == buffer.GetAbsCursorPos());
+    CHECK(buffer.GetAbsCursorPos() == buffer.GetGapStart());
+
+
+
 }
 
-void TestBufferToString(GapBuffer& buffer)
+
+TEST_CASE("test DeleteBeforeCursor func")
 {
-    buffer.InsertText("Hello World!");
-    buffer.SetCursorPos(0);
-    buffer.InsertText("Hello ");
-    buffer.SetCursorPos(buffer.GetTextEnd());
-    buffer.InsertText(" WORLD ");
-
-    std::string text = buffer.ToString();
-    std::cout << text << std::endl;
-}
-
-void TestCharAt(GapBuffer& buffer)
-{
-    std::cout << "accessing unassigned : " << buffer.CharAt(10) << std::endl;
-    buffer.InsertText("Hello World!");
-    std::cout << "Accesing  correct pos(0, 3 , 4 ,6, 11) for text : Hello World! : "<< buffer.CharAt(0) << ","
-                << buffer.CharAt(3) << ","
-                << buffer.CharAt(4) << ","
-                << buffer.CharAt(6) << ","
-                << buffer.CharAt(11) << ","
-                << std::endl;
-
-    buffer.SetCursorPos(0);
-    std::cout << "Accesing  pos(0, 3 , 4 ,6, 11) for text : Hello World! when buffer is left end : "<< buffer.CharAt(0) << ","
-                << buffer.CharAt(3) << ","
-                << buffer.CharAt(4) << ","
-                << buffer.CharAt(6) << ","
-                << buffer.CharAt(11) << ","
-                << std::endl;
-
-    buffer.SetCursorPos(4);
-    std::cout << "Buffer At Middle : " << buffer.CharAt(0) << ","
-                << buffer.CharAt(3) << ","
-                << buffer.CharAt(4) << ","
-                << buffer.CharAt(6) << ","
-                << buffer.CharAt(11) << ","
-                << std::endl;
-    buffer.SetCursorPos(11);
-    std::cout << "Buffer At end : " << buffer.CharAt(0) << ","
-                << buffer.CharAt(3) << ","
-                << buffer.CharAt(4) << ","
-                << buffer.CharAt(6) << ","
-                << buffer.CharAt(11) << ","
-                << std::endl;
-}
-
-void TestDeleteBefore(GapBuffer& buffer)
-{
-    // case : 1
-    std::cout << "Delete Empty buffer" << std::endl;
+    GapBuffer buffer;
+    //Case 1 empty buffer
+    std::string Control(BUFFER_SIZE,'\0');
     buffer.DeleteBeforeCursor();
 
-    // case : 2
-    buffer.InsertText("Hello worldd");
-    buffer.DisplayContent();
-    std::cout << "Normal Case :-" << std::endl;
-    buffer.DeleteBeforeCursor();
-    buffer.DisplayContent();
+    CHECK(buffer.GetMemorySnapshot() == Control);
 
-    // case : 3
+    // Case 2 : Delete At end
+    buffer.InsertText("Hello Worldd");
+    buffer.DeleteBeforeCursor();
+    CHECK(buffer.ToString() == "Hello World");
+
+    // Case 3 : Delete in middle
     buffer.SetCursorPos(5);
+
     buffer.InsertAtCursor('A');
-    std::cout << "Text In middle: " << std::endl;
-    buffer.DisplayContent();
-    buffer.SetCursorPos(buffer.GetTextEnd());
+    buffer.SetCursorPos(buffer.GetTextEnd() + 1);
     buffer.SetCursorPos(6);
     buffer.DeleteBeforeCursor();
-    std::cout << "After delete : " << std::endl;
-    buffer.DisplayContent();
+    CHECK(buffer.ToString() == "Hello World");
 
-    // case : 4
+    // case 4 : Delete first Character
     buffer.SetCursorPos(1);
     buffer.DeleteBeforeCursor();
-    buffer.DisplayContent();
+    CHECK(buffer.ToString() == "ello World");
+
 }
 
-void TestDeleteAfter(GapBuffer& buffer)
+TEST_CASE("Testing Delete After")
 {
-    // case : 1
-    std::cout << "Delete Empty buffer" << std::endl;
+    // Case 1 : Empty buffer
+    GapBuffer buffer;
+    std::string control(BUFFER_SIZE,'\0');
     buffer.DeleteAfterCursor();
+    REQUIRE(buffer.GetMemorySnapshot() == control);
 
-    // case : 2 At The Start
+    //case 2 : At the start
     buffer.InsertText("hHelloo worldd");
-    buffer.DisplayContent();
-    std::cout << "At the start :-" << std::endl;
     buffer.SetCursorPos(0);
     buffer.DeleteAfterCursor();
-    buffer.DisplayContent();
+    CHECK(buffer.ToString() == "Helloo worldd");
 
-    // case : 3 At the middle
-    buffer.SetCursorPos(4);
-    std::cout << "Text In middle: " << std::endl;
-    buffer.DisplayContent();
+    //case 3 : At the middle
+    buffer.SetCursorPos(5);
     buffer.DeleteAfterCursor();
-    std::cout << "After delete : " << std::endl;
-    buffer.DisplayContent();
+    CHECK(buffer.ToString() == "Hello worldd");
 
-    // case : 4 At the End
-    std::cout << "text at the end : " << std::endl;
-    buffer.SetCursorPos( buffer.GetTextEnd() - 1);
+    // case 4 : At the end
+    buffer.SetCursorPos(buffer.GetAbsTextEnd());
     buffer.DeleteAfterCursor();
-    buffer.DisplayContent();
+    CHECK(buffer.ToString() == "Hello world");
 }
 
-void TestDeleteRange(GapBuffer& buffer)
+
+TEST_CASE("Delete Range")
 {
-
-    // case 1 : Empty Buffer.
+    // case 1 : Empty buffer
+    GapBuffer buffer;
+    std::string control(BUFFER_SIZE,'\0');
     buffer.DeleteRange(0,10);
+    REQUIRE(buffer.GetMemorySnapshot() == control);
 
-    // case 2 : in beganing
+    // Case 2 : at the beginning
     buffer.InsertText("Hello World!");
-    std::cout << "Before : " << buffer.ToString() << std::endl;
     buffer.DeleteRange(0,4);
-    std::cout << "After : " << buffer.ToString() << std::endl;
 
+    CHECK(buffer.ToString() == " World!");
+    CHECK(buffer.ToString()[0] == ' ');
 
-    //case 3 : in end
+    // Case 3 : At the end
     buffer.SetCursorPos(0);
     buffer.InsertText("Hello");
-    std::cout << "Before : " << buffer.ToString() << std::endl;
     buffer.DeleteRange(5,11);
-    std::cout << "Afer : " << buffer.ToString() << std::endl;
 
-    // case 4 : in Middle
+    CHECK(buffer.ToString() == "Hello");
+
+    // Case 4 : in the middle
 
     buffer.SetCursorPos(5);
-    buffer.InsertText("WORLD world");
-    std::cout << "before : " << buffer.ToString() << std::endl;
-    buffer.DeleteRange(5,10);
-    std::cout << "after : " << buffer.ToString() << std::endl;
+    buffer.InsertText("World world");
+    buffer.DeleteRange(5,9);
+    CHECK(buffer.ToString() == "Hello world");
 
+    // case 5 : overshoot start indexes
 
+    buffer.DeleteRange(-10,10);
+    CHECK(buffer.ToString() == "");
+
+    // case 6 : overshoot end
+    buffer.InsertText("HELLO");
+    buffer.DeleteRange(0,100);
+    CHECK(buffer.ToString() == "");
+
+    // case 7 : start > end
+
+    buffer.InsertText("HELLO");
+    buffer.DeleteRange(4,3);
+    CHECK(buffer.ToString() == "HELLO");
+
+    // case 8 :  absurd values
+
+    buffer.DeleteRange(-2385,8706);
+    CHECK(buffer.ToString() == "");
 
 }
 
-*/
+
+TEST_CASE("Clear Buffer")
+{
+    GapBuffer buffer;
+
+    buffer.InsertText("Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien ");
+
+    CHECK(buffer.ToString() == "Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien ");
+
+    buffer.Clear();
+
+    REQUIRE(buffer.GetBufferSize() == BUFFER_SIZE);
+    REQUIRE(buffer.GetAbsCursorPos() == 0);
+    REQUIRE(buffer.GetGapStart() == 0);
+    REQUIRE(buffer.GetGapEnd() == BUFFER_SIZE-1);
+
+    std::string control(BUFFER_SIZE,'\0');
+    REQUIRE(buffer.GetMemorySnapshot() == control);
+
+}
+
+TEST_CASE("Shrink test")
+{
+    GapBuffer buffer;
+
+    for(int i = 0;i < BUFFER_SIZE;i++)
+    {
+        buffer.InsertAtCursor('A');
+    }
+
+    buffer.InsertText("LAST");
+
+    CHECK(buffer.GetBufferSize() == 2 * BUFFER_SIZE);
+
+    buffer.SetCursorPos(0);
+
+    buffer.DeleteRange(0,20);
+    CHECK(buffer.GetCursorPos() == 0);
+    REQUIRE(buffer.GetGapStart() == 0);
+    REQUIRE(buffer.GetBufferSize() == BUFFER_SIZE);
+    REQUIRE(buffer.GetGapEnd() < BUFFER_SIZE);
+
+
+}

@@ -112,6 +112,7 @@ else()
         -Wall
         -Wextra
         -Wpedantic
+        -g
     )
 
 endif()

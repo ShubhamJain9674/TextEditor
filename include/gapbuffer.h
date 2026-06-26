@@ -6,6 +6,8 @@
 
 #define BUFFER_SIZE 50
 #define BUFFER_GROW_SIZE 50
+#define BUFFER_SHRINK_MARGIN static_cast<int>(0.10 * BUFFER_SIZE)
+
 #define CURSOR_MOVE_RIGHT 1
 #define CURSOR_MOVE_LEFT -1
 
@@ -30,11 +32,20 @@ public:
 
     void DeleteRange(int start,int end);
 
+    void Clear();
+
     void MoveCursor(int direction,int amount);
 
-    void SetCursorPos(int pos);
+    void SetCursorPos(int pos); // User's view of pos (pos considering no gap)
 
-    int GetTextEnd();
+    int GetCursorPos(); //
+
+    int GetCursorCharacterPos() { return GetAbsCursorPos(); } // user's view
+
+
+    int GetAbsTextEnd(); // Mem View
+
+    int GetTextEnd(); // User View
 
     int GetTextStart();
 
@@ -49,7 +60,7 @@ public:
 
     std::string GetMemorySnapshot();
 
-    int GetAbsoluteCursorPos() { return cursor; }
+    int GetAbsCursorPos() { return cursor; }
 
     char GetValueAtAbsPos(int cursor);
 
@@ -61,12 +72,17 @@ public:
 
     int GetBufferSize() { return size; }
 
+
 #endif
 
 protected:
 
     void Grow();
+    void Shrink();
     void MoveGap();
+
+    int GetCursorCharacterTrueIndex();
+
 
 
 private:
@@ -74,6 +90,12 @@ private:
     {
         return pos >= gapStart && pos <= gapEnd;
     }
+
+    inline int GetGapSize()
+    {
+        return gapEnd - gapStart + 1;
+    }
+
 
     char* buffer;
     int gapStart;

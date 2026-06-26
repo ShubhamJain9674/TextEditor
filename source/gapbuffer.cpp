@@ -2,11 +2,12 @@
 
 /*
  to implement :-
- - delete range
  - (optional) iterators
  - shrink to fit:  (shrink buffer after deletion of most of the characters)
  - read through the code and revisit ideas and improvements.
 */
+
+
 
 
 
@@ -61,7 +62,7 @@ std::string GapBuffer::ToString()
 char GapBuffer::CharAt(int pos)
 {
     if(pos < 0 || pos > size)
-        return ' ';
+        return '\0';
 
     if(IsInGap(pos))
     {
@@ -122,11 +123,13 @@ void GapBuffer::DeleteBeforeCursor()
 
     buffer[cursor-1] = '\0';
     gapStart--;
+
+    Shrink();
 }
 
 void GapBuffer::DeleteAfterCursor()
 {
-    if(cursor == GetTextEnd() || gapEnd+1 >= size)
+    if(cursor == GetAbsTextEnd() || gapEnd+1 >= size)
         return;
 
     if(cursor != gapStart)
@@ -134,22 +137,82 @@ void GapBuffer::DeleteAfterCursor()
 
     buffer[gapEnd+1] = '\0';
     gapEnd++;
+    Shrink();
 }
 
 void GapBuffer::DeleteRange(int start,int end)
 {
-    if(start < 0 || end  > GetTextEnd())
-        return;
+    if(start < 0)
+        start = 0;
+
+    int textEnd = GetAbsTextEnd();
+
+    if(end > textEnd)
+        end = textEnd;
+
 
     if(start > end)
         return;
 
+    int originalCursorPos = GetCursorCharacterPos();
+
     SetCursorPos(start);
+
     for(int i = start;i <= end;i++)
     {
         DeleteAfterCursor();
     }
+
+    SetCursorPos(originalCursorPos);
 }
+
+void GapBuffer::Clear()
+{
+    // (NOTE) it would be good to realloc to default size if we clear everything but
+    // what if the person does undo.
+
+    char* tmp = nullptr;
+    tmp = (char*)realloc(buffer,BUFFER_SIZE);
+
+    if(tmp == nullptr)
+    {
+        std::cout << "Realloc failed" << std::endl;
+        return;
+    }
+
+    buffer = tmp;
+    memset((void*)buffer,'\0',BUFFER_SIZE);
+    cursor = 0;
+    gapStart = 0;
+    gapEnd = BUFFER_SIZE - 1;
+    size = BUFFER_SIZE;
+
+}
+
+int GapBuffer::GetCursorPos()
+{
+    // if(IsInGap(cursor))
+    // {
+    //     int offset = cursor - gapStart + 1;
+    //     return gapEnd + offset;
+    // }
+
+    return cursor;
+
+}
+
+
+int GapBuffer::GetCursorCharacterTrueIndex()
+{
+    if(IsInGap(cursor))
+    {
+        int offset = cursor - gapStart + 1;
+        return gapEnd + offset;
+    }
+
+    return cursor;
+}
+
 
 void GapBuffer::MoveCursor(int direction,int amount = 1)
 {
@@ -158,7 +221,7 @@ void GapBuffer::MoveCursor(int direction,int amount = 1)
     if(direction == 1)
     {
         // will not allow to move beyond allocated block;
-        int textEnd = GetTextEnd();
+        int textEnd = GetAbsTextEnd();
 
         if(gapEnd + amount > textEnd + 1)
         {
@@ -183,7 +246,11 @@ void GapBuffer::MoveCursor(int direction,int amount = 1)
 
 void GapBuffer::SetCursorPos(int pos)
 {
-    int textEnd = GetTextEnd();
+
+    // pos in user's view
+
+
+    int textEnd = GetAbsTextEnd();
     if(pos > textEnd)
     {
         if(textEnd+1 == size)
@@ -201,11 +268,25 @@ void GapBuffer::SetCursorPos(int pos)
     MoveGap();
 }
 
-// test this function by rewriting it same way as GetTextStart()
 int GapBuffer::GetTextEnd()
 {
+    // returns position of last character . (user's view)
+    int end = GetAbsTextEnd();
+    if(gapEnd < end)
+    {
+        int noOfCharFromEnd = end - gapEnd; // inclusive last char
+        int posBeforeGap = gapStart - 1;
+        return posBeforeGap + noOfCharFromEnd;
+    }
+    return end;
+
+}
+
+// test this function by rewriting it same way as GetTextStart()
+int GapBuffer::GetAbsTextEnd()
+{
     int i = size - 1;
-    while(buffer[i] == '\0')
+    while(buffer[i] == '\0' && i >= 0)
         i--;
     return i;
 }
@@ -232,12 +313,58 @@ void GapBuffer::Grow()
     buffer = tmp;
     memset(tmp+oldsize,0,size - oldsize);
 
-    gapStart = GetTextEnd() + 1;
+    gapStart = GetAbsTextEnd() + 1;
     gapEnd = size - 1;
 
     // idea instead of realloc make buffer a linked list structure :
     // - when Grow is called it mallocs another chunk of memory and the memory are linked doubly (both dir)
     // - effective when the block size is large like 4kb
+}
+
+void GapBuffer::Shrink()
+{
+    // if the cursor is at the border of buffer and user is continuously adding and deleting text
+    // it will grow and shrink repeatedly wasting cycles
+
+
+    // int requiredSize = (GetAbsTextEnd() + BUFFER_SIZE - 1) / BUFFER_SIZE; //  ceil int division
+
+    std::string text = ToString();
+    int requiredSize = ((text.size() + BUFFER_SIZE - 1) / BUFFER_SIZE) * BUFFER_SIZE;  // ceil int division and round up to next integral.
+    requiredSize = (requiredSize <= 0)? BUFFER_SIZE : requiredSize;
+
+    // std::cout << "text :" << text << std::endl;
+    // std::cout << "requiredSize : " << requiredSize << std::endl;
+    // std::cout << "size : " << size << std::endl;
+    // std::cout << "requiredSize == size " << (requiredSize == size)<< std::endl;
+
+
+    if(requiredSize == size)
+        return;
+
+    else if(text.size() < (requiredSize - BUFFER_SHRINK_MARGIN))
+    {
+        int originalCursorPos = GetCursorPos(); // users view of cursor pos stored.
+        SetCursorPos(GetTextEnd() + 1);
+        // moving cursor to the end so that gap moves before realloc
+        // could be done by just moving gap directly but Think about if it can bring inconsistency to cursor pos and gap pos.
+
+        char* temp = nullptr;
+        temp = (char*)realloc(buffer,requiredSize);
+        if(temp == nullptr)
+        {
+            std::cout << "Realloc failed!" << std::endl;
+            return;
+        }
+
+        buffer = temp;
+        size = requiredSize;
+
+        gapStart = GetAbsTextEnd() + 1;
+        gapEnd = size - 1;
+
+        SetCursorPos(originalCursorPos); // restored users view of cursor pos.
+    }
 }
 
 void GapBuffer::MoveGap()
