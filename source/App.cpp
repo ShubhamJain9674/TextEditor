@@ -21,7 +21,7 @@ App::App()
 
     //testing text input
 
-    textArea = std::make_unique<TextArea>(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer);
+    textArea = std::make_unique<TextArea>(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer,*fontManager);
 
     SDL_StartTextInput(window);
 

@@ -35,9 +35,27 @@ cross-platform Text Editor program
 
 ## How to build
 
+# Debug build
+
 ``` bash
-cmake -B build
-cmake --build build
+
+make debug
+
+```
+# Release build
+
+```bash
+
+make release
+
+```
+
+# run tests
+
+```bash
+
+make test
+
 ```
 
 ## Third-Party Libraries

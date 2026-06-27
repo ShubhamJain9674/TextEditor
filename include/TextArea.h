@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include "GapBuffer.h"
+#include "FontManager.h"
 
 /*
 This class will hold all functionality of Text area such as
@@ -16,7 +17,7 @@ This class will hold all functionality of Text area such as
 class TextArea
 {
 public:
-    TextArea(float x,float y,float w,float h,SDL_Renderer* renderer);
+    TextArea(float x,float y,float w,float h,SDL_Renderer* renderer,FontManager& fm);
 
     void Update(int w,int h);
     void AddChar(char ch);
@@ -30,6 +31,8 @@ private:
 
     SDL_FRect rect;
     SDL_Renderer* renderer;
+    FontManager& fontManager;
+
 
 
 
@@ -41,7 +44,6 @@ private:
     Uint16 pady = 10;     // boundary padding y
 
 
-    TTF_Font*   font          = nullptr;
     Uint16      fontSize      = 18;
     SDL_Color   txtColor      = { 255, 255, 255, SDL_ALPHA_OPAQUE };
     float       charSpacing   = 0.75f;                                      // inter character spacing.

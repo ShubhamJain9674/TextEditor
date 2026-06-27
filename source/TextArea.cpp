@@ -1,21 +1,10 @@
 #include "TextArea.h"
 
-TextArea::TextArea(float x,float y,float w,float h,SDL_Renderer* renderer)
+TextArea::TextArea(float x,float y,float w,float h,SDL_Renderer* renderer,FontManager& fm)
+                    :fontManager(fm)
 {
     rect = { x, y, w, h };
     this->renderer = renderer;
-
-    if (!TTF_Init()) {
-        SDL_Log("Couldn't initialize SDL_ttf: %s\n", SDL_GetError());
-        // return SDL_APP_FAILURE;
-        return;
-    }
-
-    font = TTF_OpenFont("Roboto_Condensed-Black.ttf", fontSize);
-    if (!font) {
-        SDL_Log("Couldn't open font: %s\n", SDL_GetError());
-        return;
-    }
 
 }
 
@@ -79,25 +68,5 @@ void TextArea::Render()
 
 SDL_Texture* TextArea::GetCharacterTexture(char ch)
 {
-
-    if(glyphCache.find(ch) == glyphCache.end())
-    {
-        SDL_Texture *glTexture = nullptr;
-        char temp[2] = { ch, '\0' };
-
-        SDL_Surface *txtSurface = TTF_RenderText_Blended(this->font,temp, 0, txtColor);
-        if (txtSurface) {
-            glTexture = SDL_CreateTextureFromSurface(renderer, txtSurface);
-            SDL_DestroySurface(txtSurface);
-        }
-        if (!glTexture) {
-            SDL_Log("Couldn't create text: %s\n", SDL_GetError());
-            // return SDL_APP_FAILURE;
-            return nullptr;
-        }
-        glyphCache[ch] = glTexture;
-        return glTexture;
-    }
-    else
-        return glyphCache[ch];
+    return fontManager.GetCharacterTexture(ch,renderer,txtColor);
 }

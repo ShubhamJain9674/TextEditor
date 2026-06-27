@@ -6,6 +6,8 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
+
 
 #include "FileHandling.h"
 
@@ -25,9 +27,23 @@ public:
 
 
     static std::filesystem::path GetFontDirPath();
-private:
-    std::vector<std::string> fonts;
 
+    SDL_Texture* GetCharacterTexture(char ch,SDL_Renderer* renderer,SDL_Color);
+
+
+private:
+
+    std::vector<std::string> availableFonts;
+    std::string defaultFont;
+
+    TTF_Font* currentFont{};
+    int       fontSize      = 18;
+
+
+
+    std::unordered_map<char,SDL_Texture*> glyphCache;   // (NOTE)right now caching for a single size if the cache needs to support multiple size
+                                                         // either hold multiple cache  --> doesnt seem practical
+                                                         // create a structure that holds different character data like bold ,italic,size etc.
 };
 
 

@@ -118,6 +118,17 @@ else()
 endif()
 
 # ============================================================
+# Copy assets next to executable
+# ============================================================
+
+add_custom_command(TARGET TextEditor POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/fonts
+        $<TARGET_FILE_DIR:TextEditor>/fonts
+)
+
+
+# ============================================================
 # Tests
 # ============================================================
 
