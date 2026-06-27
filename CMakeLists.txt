@@ -61,7 +61,7 @@ file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
 
 # Remove main.cpp from library
 list(REMOVE_ITEM APP_SOURCES
-    "${CMAKE_SOURCE_DIR}/source/main.cpp"
+    "${CMAKE_SOURCE_DIR}/source/Main.cpp"
 )
 
 # ============================================================
@@ -88,7 +88,7 @@ target_include_directories(TextEditorLib
 # ============================================================
 
 add_executable(TextEditor
-    source/main.cpp
+    source/Main.cpp
 )
 
 target_link_libraries(TextEditor

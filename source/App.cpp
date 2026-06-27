@@ -1,4 +1,4 @@
-#include "app.h"
+#include "App.h"
 
 App::App()
 {
@@ -17,11 +17,14 @@ App::App()
         running  = false;
     }
 
+    fontManager = std::make_unique<FontManager>();
 
     //testing text input
+
     textArea = std::make_unique<TextArea>(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer);
 
     SDL_StartTextInput(window);
+
 
 }
 
@@ -34,7 +37,7 @@ App::~App()
 }
 
 
-void App::run()
+void App::Run()
 {
 
 
@@ -51,25 +54,25 @@ void App::run()
                 // handleInput();
 
                 size_t lastIndex = std::strlen(event.text.text) - 1;
-                textArea->addChar(event.text.text[lastIndex]);
+                textArea->AddChar(event.text.text[lastIndex]);
             }
         }
 
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
-        textArea->update(w,h);
+        textArea->Update(w,h);
 
-        render();
+        Render();
     }
 }
 
-void App::render()
+void App::Render()
 {
 
     SDL_SetRenderDrawColor(renderer,bgColor.r,bgColor.g,bgColor.b,bgColor.a);
     SDL_RenderClear(renderer);
 
-    textArea->render();
+    textArea->Render();
 
     SDL_RenderPresent(renderer);
 

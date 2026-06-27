@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gapbuffer.h"
+#include "GapBuffer.h"
 #include <string>
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
@@ -319,7 +319,7 @@ TEST_CASE("Shrink test")
     buffer.SetCursorPos(0);
 
     buffer.DeleteRange(0,20);
-    CHECK(buffer.GetCursorPos() == 0);
+    CHECK(buffer.GetCursorPos() == 0);  // correct Cursor check.
     REQUIRE(buffer.GetGapStart() == 0);
     REQUIRE(buffer.GetBufferSize() == BUFFER_SIZE);
     REQUIRE(buffer.GetGapEnd() < BUFFER_SIZE);

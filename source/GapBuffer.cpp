@@ -1,9 +1,8 @@
-#include "gapbuffer.h"
+#include "GapBuffer.h"
 
 /*
  to implement :-
  - (optional) iterators
- - shrink to fit:  (shrink buffer after deletion of most of the characters)
  - read through the code and revisit ideas and improvements.
 */
 
@@ -20,10 +19,10 @@ GapBuffer::GapBuffer()
         std::cout << "Mem alloc failed!" << std::endl;
     }
 
-    gapStart     = 0;
-    gapEnd       = BUFFER_SIZE - 1;
-    cursor        = 0;
-    size          = BUFFER_SIZE;
+    gapStart  = 0;
+    gapEnd    = BUFFER_SIZE - 1;
+    cursor    = 0;
+    size      = BUFFER_SIZE;
 }
 
 
@@ -57,6 +56,20 @@ std::string GapBuffer::ToString()
             text += buffer[i];
     }
     return text;
+}
+
+int GapBuffer::GetTextSize()
+{
+    int textSize = 0;
+
+    for(int i = 0; i < size;i++)
+    {
+        if(buffer[i] == '\0')
+            continue;
+        textSize++;
+    }
+
+    return textSize;
 }
 
 char GapBuffer::CharAt(int pos)
@@ -333,12 +346,6 @@ void GapBuffer::Shrink()
     int requiredSize = ((text.size() + BUFFER_SIZE - 1) / BUFFER_SIZE) * BUFFER_SIZE;  // ceil int division and round up to next integral.
     requiredSize = (requiredSize <= 0)? BUFFER_SIZE : requiredSize;
 
-    // std::cout << "text :" << text << std::endl;
-    // std::cout << "requiredSize : " << requiredSize << std::endl;
-    // std::cout << "size : " << size << std::endl;
-    // std::cout << "requiredSize == size " << (requiredSize == size)<< std::endl;
-
-
     if(requiredSize == size)
         return;
 
@@ -400,5 +407,25 @@ void GapBuffer::MoveGap()
         cursor = gapStart;
     }
 }
+
+
+
+#ifndef NDEBUG
+
+std::string GapBuffer::GetMemorySnapshot()
+{
+    std::string memorySnap = "";
+
+    for(int i = 0;i < size;i++)
+    {
+        memorySnap += buffer[i];
+    }
+
+    return memorySnap;
+}
+
+
+
+#endif
 
 

@@ -4,6 +4,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <unordered_map>
 #include <string>
+#include "GapBuffer.h"
 
 /*
 This class will hold all functionality of Text area such as
@@ -17,12 +18,12 @@ class TextArea
 public:
     TextArea(float x,float y,float w,float h,SDL_Renderer* renderer);
 
-    void update(int w,int h);
-    void addChar(char ch);
-    void render();
+    void Update(int w,int h);
+    void AddChar(char ch);
+    void Render();
 
 private:
-    SDL_Texture* getCharacterTexture(char ch);
+    SDL_Texture* GetCharacterTexture(char ch);
 
 
 private:
@@ -60,8 +61,10 @@ private:
 
     std::unordered_map<char,SDL_Texture*> glyphCache;
 
+    GapBuffer textBuffer;
     //placeholder string holding the text;
-    std::string text;
+
+
 
 };
 

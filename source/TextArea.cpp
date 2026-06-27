@@ -19,20 +19,20 @@ TextArea::TextArea(float x,float y,float w,float h,SDL_Renderer* renderer)
 
 }
 
-void TextArea::addChar(char ch)
+void TextArea::AddChar(char ch)
 {
-    text += ch;
-    SDL_Log(text.c_str());
+    textBuffer.InsertAtCursor(ch);
+    SDL_Log(textBuffer.ToString().c_str());
 }
 
-void TextArea::update(int w,int h)
+void TextArea::Update(int w,int h)
 {
     // recalibrate dims
     rect.w = w;
     rect.h = h;
 }
 
-void TextArea::render()
+void TextArea::Render()
 {
 
     Uint8 r,g,b,a;
@@ -44,9 +44,15 @@ void TextArea::render()
     SDL_RenderRect(renderer,&rect);
     int posx = textAreaStart + padx;
     int posy = textAreaStart + pady;
+
+    std::string text = textBuffer.ToString();     // seems quite expensive to hold a quite lot of text to render . may be gapbuffer should
+    // have  a function to stream text
+    // NOTE : std::string doesnt use stack internally , it still expensive to return the whole thing and should implement a streaming window
+
+
     for(size_t i = 0; i < text.size(); i++)
     {
-        SDL_Texture* tex = getCharacterTexture(text[i]);
+        SDL_Texture* tex = GetCharacterTexture(text[i]);
 
         if(tex)
         {
@@ -71,7 +77,7 @@ void TextArea::render()
 
 }
 
-SDL_Texture* TextArea::getCharacterTexture(char ch)
+SDL_Texture* TextArea::GetCharacterTexture(char ch)
 {
 
     if(glyphCache.find(ch) == glyphCache.end())

@@ -51,6 +51,8 @@ public:
 
     std::string ToString();
 
+    int GetTextSize();
+
     char CharAt(int pos);
 
 
@@ -103,21 +105,3 @@ private:
     int cursor;
     int size;
 };
-
-#ifndef NDEBUG
-
-std::string GapBuffer::GetMemorySnapshot()
-{
-    std::string memorySnap = "";
-
-    for(int i = 0;i < size;i++)
-    {
-        memorySnap += buffer[i];
-    }
-
-    return memorySnap;
-}
-
-
-
-#endif

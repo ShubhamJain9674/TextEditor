@@ -1,11 +1,11 @@
-#include "app.h"
+#include "App.h"
 
 
 
 int main()
 {
     App app;
-    app.run();
+    app.Run();
 
     return 0;
 }

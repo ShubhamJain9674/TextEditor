@@ -9,7 +9,7 @@
 #include <cstring>
 
 
-
+#include "FontManager.h"
 #include "TextArea.h"
 
 #define WINDOW_WIDTH 1280
@@ -21,8 +21,8 @@ public:
     App();
     ~App();
 
-    void run();
-    void render();
+    void Run();
+    void Render();
 
 
 
@@ -34,6 +34,7 @@ private:
     SDL_Renderer *renderer = nullptr;
 
 
+    std::unique_ptr<FontManager> fontManager;
     std::unique_ptr<TextArea> textArea;
     SDL_Color bgColor = { 0,0,0,255 };
 };
