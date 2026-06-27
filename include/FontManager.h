@@ -37,7 +37,7 @@ private:
     std::string defaultFont;
 
     TTF_Font* currentFont{};
-    int       fontSize      = 18;
+    int       fontSize      = 24;
 
 
 

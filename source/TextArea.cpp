@@ -1,5 +1,6 @@
 #include "TextArea.h"
 
+
 TextArea::TextArea(float x,float y,float w,float h,SDL_Renderer* renderer,FontManager& fm)
                     :fontManager(fm)
 {
@@ -11,7 +12,13 @@ TextArea::TextArea(float x,float y,float w,float h,SDL_Renderer* renderer,FontMa
 void TextArea::AddChar(char ch)
 {
     textBuffer.InsertAtCursor(ch);
-    SDL_Log(textBuffer.ToString().c_str());
+    // SDL_Log(textBuffer.ToString().c_str());
+}
+
+void TextArea::DeleteBeforeCursor()
+{
+    //(NOTE) need to implement cursor and account for cursor position.
+    textBuffer.DeleteBeforeCursor();
 }
 
 void TextArea::Update(int w,int h)
@@ -70,3 +77,6 @@ SDL_Texture* TextArea::GetCharacterTexture(char ch)
 {
     return fontManager.GetCharacterTexture(ch,renderer,txtColor);
 }
+
+
+

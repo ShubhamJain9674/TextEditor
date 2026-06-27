@@ -46,15 +46,28 @@ void App::Run()
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
-            if (event.type == SDL_EVENT_QUIT) {
-                running = false;
-            }
-            if(event.type == SDL_EVENT_TEXT_INPUT)
+            switch(event.type)
             {
-                // handleInput();
+                case SDL_EVENT_QUIT:
+                {
+                    running = false;
+                    break;
+                }
 
-                size_t lastIndex = std::strlen(event.text.text) - 1;
-                textArea->AddChar(event.text.text[lastIndex]);
+                case SDL_EVENT_KEY_DOWN:
+                {
+                    if(event.key.key == SDLK_BACKSPACE )
+                        textArea->DeleteBeforeCursor();
+
+                    break;
+                }
+
+                case SDL_EVENT_TEXT_INPUT:
+                {
+                    size_t lastIndex = std::strlen(event.text.text) - 1;
+                    textArea->AddChar(event.text.text[lastIndex]);
+                    break;
+                }
             }
         }
 
