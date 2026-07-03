@@ -20,8 +20,8 @@ App::App()
     fontManager = std::make_unique<FontManager>();
 
     //testing text input
-
-    textArea = std::make_unique<TextArea>(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,renderer,*fontManager);
+    SDL_FRect textRect = { .0f ,.0f ,WINDOW_WIDTH,WINDOW_HEIGHT };
+    textArea = std::make_unique<TextArea>(renderer,*fontManager,textRect);
 
     SDL_StartTextInput(window);
 
@@ -56,19 +56,20 @@ void App::Run()
 
                 case SDL_EVENT_KEY_DOWN:
                 {
+                    /*
                     if(event.key.key == SDLK_BACKSPACE )
-                        textArea->DeleteBeforeCursor();
+                        // textArea->DeleteBeforeCursor();
 
                     else if(event.key.key == SDLK_RETURN )
-                        textArea->InsertNewLine();
-
+                        // textArea->InsertNewLine();
+                    */
                     break;
                 }
 
                 case SDL_EVENT_TEXT_INPUT:
                 {
-                    size_t lastIndex = std::strlen(event.text.text) - 1;
-                    textArea->AddChar(event.text.text[lastIndex]);
+                    // size_t lastIndex = std::strlen(event.text.text) - 1;
+                    // textArea->AddChar(event.text.text[lastIndex]);
                     break;
                 }
             }
@@ -88,7 +89,7 @@ void App::Render()
     SDL_SetRenderDrawColor(renderer,bgColor.r,bgColor.g,bgColor.b,bgColor.a);
     SDL_RenderClear(renderer);
 
-    textArea->Render();
+    textArea->RenderDebug();
 
     SDL_RenderPresent(renderer);
 
