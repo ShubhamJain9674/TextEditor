@@ -59,6 +59,9 @@ void App::Run()
                     if(event.key.key == SDLK_BACKSPACE )
                         textArea->DeleteBeforeCursor();
 
+                    else if(event.key.key == SDLK_RETURN )
+                        textArea->InsertNewLine();
+
                     break;
                 }
 

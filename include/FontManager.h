@@ -25,18 +25,18 @@ public:
     FontManager();
     ~FontManager();
 
-
     static std::filesystem::path GetFontDirPath();
 
     SDL_Texture* GetCharacterTexture(char ch,SDL_Renderer* renderer,SDL_Color);
+    int GetFontHeight() { return TTF_GetFontHeight(currentFont); }
 
 
 private:
 
-    std::vector<std::string> availableFonts;
-    std::string defaultFont;
+    std::vector<std::string> availableFonts;            // all the available fonts.
+    std::string defaultFont;                            // default fallback font.
 
-    TTF_Font* currentFont{};
+    TTF_Font* currentFont{};                            // currentFont in use.
     int       fontSize      = 24;
 
 
