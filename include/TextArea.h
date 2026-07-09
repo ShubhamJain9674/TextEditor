@@ -6,34 +6,9 @@
 #include "GapBuffer.h"
 #include "FontManager.h"
 
+class Cursor;
 
-
-
-
-
-class Line
-{
-public:
-    Line(SDL_FRect rect,SDL_Renderer* renderer);
-
-    void SetHeight(unsigned int h) { height = h;}
-
-#ifndef NDEBUG
-
-    void RenderDebug();
-
-#endif
-
-private:
-
-    SDL_FRect rect;
-    SDL_Renderer* renderer;
-
-    std::vector<int> cursorPosXHistory;
-    int targetIndex {0};
-    int height;
-};
-
+class Line;
 
 
 class TextArea
@@ -45,16 +20,21 @@ class TextArea
 public:
     TextArea(SDL_Renderer* renderer,FontManager& fm,SDL_FRect rect);
 
-    void Update(int width,int height);
+    void Update(int width,int height,float dt);
+    void Update(SDL_FRect newRect,float dt);
 
+    SDL_FRect GetRect()const { return rect; }
+    const Line* GetLine(size_t index)const;
 
 #ifndef NDEBUG
     void RenderDebug();
 #endif
 
 
-    void GetTextStartCoord(float* x,float* y);
-    void InsertLine();
+    void GetTextStartCoord(float* x,float* y) const;
+    void InsertLineAtEnd();
+
+    int GetFontHeight() const { return fontManager.GetFontHeight(); }
 
 
 private:
@@ -62,13 +42,85 @@ private:
     SDL_Renderer* renderer;
     FontManager& fontManager;
     SDL_FRect rect;
+
+    std::unique_ptr<Cursor> cursor;
+
     std::unique_ptr<GapBuffer> textBuffer;
 
     std::vector<std::unique_ptr<Line>> lines;
 
 
-    float boundaryMarginX = 0.1f;
-    float boundaryMarginY = 0.1f;
+    float boundaryMarginX = 1.0f;
+    float boundaryMarginY = 1.0f;
+
+
+
+
+};
+
+
+
+class Line
+{
+public:
+    Line(const TextArea& textArea,SDL_Renderer* renderer,int lineNo);
+
+    void Update(float dt);
+    void GetLineEndCoordinates(float* x,float* y)const;
+
+    #ifndef NDEBUG
+
+    void RenderDebug();
+
+    #endif
+
+private:
+
+    const TextArea&  textArea;
+    SDL_Renderer*    renderer;
+    int              lineNo;
+    SDL_FRect        rect;
+
+
+    std::vector<int> cursorPosXHistory;
+    int targetIndex {0};
+
+    float linePadx = 3.0f;
+
+
+};
+
+
+class Cursor
+{
+public:
+    Cursor(SDL_Renderer* renderer,const TextArea& textArea);
+
+#ifndef NDEBUG
+    void RenderDebug();
+#endif
+
+    void Update(float dt);
+
+private:
+    SDL_Renderer* renderer;
+    const TextArea& textArea;
+
+    SDL_FRect rect;
+
+    int bufferIndex{0};
+    int lineIndex{0};
+    int lineNo{0};
+
+    float cursorWidth = 2.0f;
+    float cursorHeightFactor = 0.90f;
+
+    //cursor animation
+    float animTime = 0.0f;
+    float blinkTime = 0.5f;
+    SDL_Color cursorColor = {0 ,255,255,255 };
+    Uint8 cursorAlpha = 255;
+
 
 
 };

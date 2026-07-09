@@ -25,6 +25,8 @@ public:
     void Render();
 
 
+private:
+    void UpdateDeltaTime();
 
 
 private:
@@ -37,6 +39,11 @@ private:
     std::unique_ptr<FontManager> fontManager;
     std::unique_ptr<TextArea> textArea;
     SDL_Color bgColor = { 0,0,0,255 };
+
+
+    float dt { 0.0f };
+    Uint64 lastRecordedTime = 0;
+
 };
 
 

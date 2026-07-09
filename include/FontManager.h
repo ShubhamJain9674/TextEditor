@@ -28,7 +28,7 @@ public:
     static std::filesystem::path GetFontDirPath();
 
     SDL_Texture* GetCharacterTexture(char ch,SDL_Renderer* renderer,SDL_Color);
-    int GetFontHeight() { return TTF_GetFontHeight(currentFont); }
+    int GetFontHeight()const { return TTF_GetFontHeight(currentFont); }
 
 
 private:

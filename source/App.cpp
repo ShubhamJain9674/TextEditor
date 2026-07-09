@@ -25,6 +25,9 @@ App::App()
 
     SDL_StartTextInput(window);
 
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+
 
 }
 
@@ -43,6 +46,8 @@ void App::Run()
 
     while(running)
     {
+        UpdateDeltaTime();
+
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
@@ -76,8 +81,10 @@ void App::Run()
         }
 
         int w, h;
+
         SDL_GetWindowSize(window, &w, &h);
-        textArea->Update(w,h);
+        textArea->Update(w,h,dt);
+
 
         Render();
     }
@@ -93,4 +100,12 @@ void App::Render()
 
     SDL_RenderPresent(renderer);
 
+}
+
+void App::UpdateDeltaTime()
+{
+    Uint64 now = SDL_GetTicks();
+    dt = (now - lastRecordedTime) / 1000.0f;
+
+    lastRecordedTime = now;
 }
