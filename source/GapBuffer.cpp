@@ -1,5 +1,9 @@
 #include "GapBuffer.h"
 
+#define CURSOR_MOVE_RIGHT 1
+#define CURSOR_MOVE_LEFT -1
+
+
 /*
  to implement :-
  - (optional) iterators

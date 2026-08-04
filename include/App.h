@@ -5,12 +5,14 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
+
 #include <memory>
 #include <cstring>
 
 
 #include "FontManager.h"
 #include "TextArea.h"
+#include "InputManager.hpp"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
@@ -37,12 +39,14 @@ private:
 
 
     std::unique_ptr<FontManager> fontManager;
-    std::unique_ptr<TextArea> textArea;
     SDL_Color bgColor = { 0,0,0,255 };
 
 
     float dt { 0.0f };
     Uint64 lastRecordedTime = 0;
+
+
+    InputManager input;
 
 };
 

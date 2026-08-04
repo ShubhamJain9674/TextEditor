@@ -6,6 +6,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
 
+#define CURSOR_MOVE_RIGHT 1
+#define CURSOR_MOVE_LEFT -1
+
+
 /*
 Refactor Test Cases :-
 - Complete Testing

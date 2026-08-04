@@ -8,8 +8,6 @@
 #define BUFFER_GROW_SIZE 50
 #define BUFFER_SHRINK_MARGIN static_cast<int>(0.10 * BUFFER_SIZE)
 
-#define CURSOR_MOVE_RIGHT 1
-#define CURSOR_MOVE_LEFT -1
 
 
 

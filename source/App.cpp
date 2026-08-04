@@ -1,4 +1,6 @@
 #include "App.h"
+#include <iostream> // TODO
+
 
 App::App()
 {
@@ -21,7 +23,6 @@ App::App()
 
     //testing text input
     SDL_FRect textRect = { .0f ,.0f ,WINDOW_WIDTH,WINDOW_HEIGHT };
-    textArea = std::make_unique<TextArea>(renderer,*fontManager,textRect);
 
     SDL_StartTextInput(window);
 
@@ -49,8 +50,11 @@ void App::Run()
         UpdateDeltaTime();
 
         SDL_Event event;
+        std::vector<Command> commands;
         while(SDL_PollEvent(&event))
         {
+            commands.push_back(input.HandleEvent(event));
+
             switch(event.type)
             {
                 case SDL_EVENT_QUIT:
@@ -58,33 +62,15 @@ void App::Run()
                     running = false;
                     break;
                 }
-
-                case SDL_EVENT_KEY_DOWN:
-                {
-                    /*
-                    if(event.key.key == SDLK_BACKSPACE )
-                        // textArea->DeleteBeforeCursor();
-
-                    else if(event.key.key == SDLK_RETURN )
-                        // textArea->InsertNewLine();
-                    */
-                    break;
-                }
-
-                case SDL_EVENT_TEXT_INPUT:
-                {
-                    // size_t lastIndex = std::strlen(event.text.text) - 1;
-                    // textArea->AddChar(event.text.text[lastIndex]);
-                    break;
-                }
             }
         }
 
-        int w, h;
+        //TODO
+        for(auto command : commands)
+        {
 
-        SDL_GetWindowSize(window, &w, &h);
-        textArea->Update(w,h,dt);
-
+            std::cout << Command::ToString(command) << std::endl;
+        }
 
         Render();
     }
@@ -96,7 +82,6 @@ void App::Render()
     SDL_SetRenderDrawColor(renderer,bgColor.r,bgColor.g,bgColor.b,bgColor.a);
     SDL_RenderClear(renderer);
 
-    textArea->RenderDebug();
 
     SDL_RenderPresent(renderer);
 
