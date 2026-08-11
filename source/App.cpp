@@ -3,6 +3,7 @@
 
 
 App::App()
+    :inputDispatcher(*this)
 {
     if(!SDL_Init(SDL_INIT_VIDEO))
     {
@@ -43,37 +44,37 @@ App::~App()
 
 void App::Run()
 {
-
-
     while(running)
     {
-        UpdateDeltaTime();
-
-        SDL_Event event;
-        std::vector<Command> commands;
-        while(SDL_PollEvent(&event))
-        {
-            commands.push_back(input.HandleEvent(event));
-
-            switch(event.type)
-            {
-                case SDL_EVENT_QUIT:
-                {
-                    running = false;
-                    break;
-                }
-            }
-        }
-
-        //TODO
-        for(auto command : commands)
-        {
-
-            std::cout << Command::ToString(command) << std::endl;
-        }
-
+        Update();
         Render();
     }
+}
+
+void App::Update()
+{
+    UpdateDeltaTime();
+
+    SDL_Event event;
+    std::vector<Command> commands;
+
+    while(SDL_PollEvent(&event))
+    {
+        commands.push_back(input.HandleEvent(event));
+
+
+        switch(event.type)
+        {
+            case SDL_EVENT_QUIT:
+            {
+                running = false;
+                break;
+            }
+        }
+    }
+    focus.Update(commands);
+    inputDispatcher.Dispatch(focus.GetCurrentlyFocused(),commands);
+
 }
 
 void App::Render()
@@ -94,3 +95,9 @@ void App::UpdateDeltaTime()
 
     lastRecordedTime = now;
 }
+
+void App::HandleCommands(const std::vector<Command>& commands)
+{
+    // TODO
+}
+

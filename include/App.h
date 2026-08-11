@@ -9,22 +9,27 @@
 #include <memory>
 #include <cstring>
 
-
+#include "Command.hpp"
 #include "FontManager.h"
 #include "TextArea.h"
 #include "InputManager.hpp"
+#include "FocusManager.hpp"
+#include "InputDispatcher.hpp"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-class App
+class App : public ICommandHandler
 {
 public:
     App();
     ~App();
 
     void Run();
+    void Update();
     void Render();
+
+    void HandleCommands(const std::vector<Command>& commands)override;
 
 
 private:
@@ -47,6 +52,8 @@ private:
 
 
     InputManager input;
+    FocusManager focus;
+    InputDispatcher inputDispatcher;
 
 };
 
