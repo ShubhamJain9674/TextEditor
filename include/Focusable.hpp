@@ -6,11 +6,8 @@
 class IFocusable : public ICommandHandler
 {
 public:
-    explicit IFocusable(SDL_FRect& rect)
-        :rect(rect)
-    {
+    IFocusable() = default;
 
-    }
     virtual ~IFocusable() = default;
 
     bool IsUnderMouse(float mouseX,float mouseY)const
@@ -20,8 +17,15 @@ public:
     }
 
 
-private:
-    const SDL_FRect& rect;
+    virtual void OnFocused(){};
+
+    virtual void OnUnfocused(){};
+
+    virtual std::string GetName() = 0;
+
+
+protected:
+    SDL_FRect rect{};
 };
 
 

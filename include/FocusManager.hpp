@@ -5,7 +5,9 @@ class FocusManager
 {
 
 public:
-    FocusManager() = default;
+
+    FocusManager(IFocusable* defaultElement)
+        :defaultElement(defaultElement),currentlyFocused(defaultElement){}
 
     void Update(std::vector<Command>& commands);
 
@@ -17,8 +19,10 @@ public:
 
 private:
     IFocusable* GetUnderMouseElement(float mouseX,float mouseY);
+    void HandleFocusChange(IFocusable* newFocused);
 
 private:
+    IFocusable* const defaultElement { nullptr };
     IFocusable* currentlyFocused { nullptr };
     std::vector<IFocusable*> focusableList;
 };

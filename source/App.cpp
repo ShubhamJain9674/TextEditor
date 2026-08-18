@@ -3,8 +3,10 @@
 
 
 App::App()
-    :inputDispatcher(*this)
+    :inputDispatcher(*this),focus(this)
 {
+    this->rect = { .0f,.0f,WINDOW_WIDTH,WINDOW_HEIGHT };
+
     if(!SDL_Init(SDL_INIT_VIDEO))
     {
         SDL_Log("SDL init failed");
@@ -70,11 +72,22 @@ void App::Update()
                 running = false;
                 break;
             }
+
+            case SDL_EVENT_WINDOW_RESIZED:
+            {
+                int w,h;
+                if(SDL_GetWindowSize(window,&w,&h))
+                {
+                    this->rect = { 0,0,w,h };
+                }
+                break;
+            }
         }
     }
+
+
     focus.Update(commands);
     inputDispatcher.Dispatch(focus.GetCurrentlyFocused(),commands);
-
 }
 
 void App::Render()

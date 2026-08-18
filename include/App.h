@@ -19,7 +19,7 @@
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-class App : public ICommandHandler
+class App : public IFocusable
 {
 public:
     App();
@@ -31,12 +31,23 @@ public:
 
     void HandleCommands(const std::vector<Command>& commands)override;
 
+    // void OnFocused()override;
+    // void OnUnfocused()override;
+
+    std::string GetName()override { return "APP"; }
+
 
 private:
     void UpdateDeltaTime();
 
 
 private:
+
+
+    InputDispatcher inputDispatcher;
+    InputManager input;
+    FocusManager focus;
+
 
     bool running = true;
     SDL_Window *window = nullptr;
@@ -51,9 +62,6 @@ private:
     Uint64 lastRecordedTime = 0;
 
 
-    InputManager input;
-    FocusManager focus;
-    InputDispatcher inputDispatcher;
 
 };
 
