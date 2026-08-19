@@ -206,7 +206,7 @@ void GapBuffer::Clear()
 
 }
 
-int GapBuffer::GetCursorPos()
+int GapBuffer::GetCursorPos()const
 {
     // if(IsInGap(cursor))
     // {

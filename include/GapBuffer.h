@@ -36,7 +36,7 @@ public:
 
     void SetCursorPos(int pos); // User's view of pos (pos considering no gap)
 
-    int GetCursorPos(); //
+    int GetCursorPos()const; //user's view as well as imple as cursor will always be before gap
 
     int GetCursorCharacterPos() { return GetAbsCursorPos(); } // user's view
 

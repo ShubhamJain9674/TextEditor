@@ -7,6 +7,7 @@ class IFocusable : public ICommandHandler
 {
 public:
     IFocusable() = default;
+    IFocusable(SDL_FRect rect):rect(rect){}
 
     virtual ~IFocusable() = default;
 
