@@ -20,7 +20,27 @@ public:
     void HandleCommands(const std::vector<Command>& commands)override;
     void Update(float dt,SDL_FRect);
 
+
 private:
+
+    void HandleCharEntry(const Command& c);
+
+    void HandleCharDelBack(const Command& c);
+
+    void HandleCharDelForw(const Command& c);
+
+    void HandleCurMovLeft(const Command& c);
+
+    void HandleCurMovRight(const Command& c);
+
+    void HandleCurMovUp(const Command& c);
+
+    void HandleCurMovDown(const Command& c);
+
+    void HandleMouseClick(const Command& c);
+
+private:
+
     const FontManager& fontManager;
     GapBuffer buffer;
     Cursor cursor;

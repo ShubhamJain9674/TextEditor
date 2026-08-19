@@ -9,6 +9,9 @@
 #define BUFFER_SHRINK_MARGIN static_cast<int>(0.10 * BUFFER_SIZE)
 
 
+#define BUFFER_CURSOR_MOVE_RIGHT 1
+#define BUFFER_CURSOR_MOVE_LEFT -1
+
 
 
 
