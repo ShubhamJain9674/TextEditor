@@ -4,6 +4,7 @@
 
 enum class CommandType
 {
+    NONE,
     MOUSE_CLICK,
     MOUSE_DRAG,
     KEYBOARD_CHARACTER_ENTRY,
@@ -24,9 +25,9 @@ enum class CommandType
 
 struct Command
 {
-    CommandType type;
+    CommandType type = CommandType::NONE;
 
-    char key;                  // Keyboard character
+    char key = '\0';                  // Keyboard character
 
     int mouseX;               // Mouse Click coordinates
     int mouseY;

@@ -7,6 +7,7 @@ App::App()
 {
     this->rect = { .0f,.0f,WINDOW_WIDTH,WINDOW_HEIGHT };
 
+
     if(!SDL_Init(SDL_INIT_VIDEO))
     {
         SDL_Log("SDL init failed");
@@ -24,7 +25,10 @@ App::App()
 
     fontManager = std::make_unique<FontManager>();
 
+    //TODO: TEMP
+
     //testing text input
+
     SDL_FRect textRect = { .0f ,.0f ,WINDOW_WIDTH,WINDOW_HEIGHT };
 
     SDL_StartTextInput(window);
@@ -32,6 +36,8 @@ App::App()
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 
+    textArea = std::make_unique<TextArea>(*fontManager,textRect);
+    focus.addElement(textArea.get());
 
 }
 
@@ -79,6 +85,7 @@ void App::Update()
                 if(SDL_GetWindowSize(window,&w,&h))
                 {
                     this->rect = { 0,0,w,h };
+
                 }
                 break;
             }
@@ -86,6 +93,9 @@ void App::Update()
     }
 
 
+    // TODO : Temp
+
+    textArea->Update(dt,rect);
     focus.Update(commands);
     inputDispatcher.Dispatch(focus.GetCurrentlyFocused(),commands);
 }
@@ -107,10 +117,13 @@ void App::UpdateDeltaTime()
     dt = (now - lastRecordedTime) / 1000.0f;
 
     lastRecordedTime = now;
+
 }
 
 void App::HandleCommands(const std::vector<Command>& commands)
 {
     // TODO
+    // std::cout << "hello from app" << std::endl;
+
 }
 

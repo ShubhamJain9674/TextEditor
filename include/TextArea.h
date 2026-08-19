@@ -25,7 +25,5 @@ private:
     GapBuffer buffer;
     Cursor cursor;
 
-
-
 };
 

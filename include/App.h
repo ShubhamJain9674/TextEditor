@@ -58,6 +58,9 @@ private:
     SDL_Color bgColor = { 0,0,0,255 };
 
 
+    // TODO: Temp for testing later design an area,
+    std::unique_ptr<TextArea> textArea;
+
     float dt { 0.0f };
     Uint64 lastRecordedTime = 0;
 

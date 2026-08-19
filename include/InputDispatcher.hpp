@@ -1,7 +1,6 @@
 #pragma once
 #include "Command.hpp"
 
-
 class InputDispatcher
 {
 public:
@@ -13,7 +12,7 @@ public:
 
     void Dispatch(ICommandHandler* element,const std::vector<Command>& commands)
     {
-        if(!element)
+        if(element == nullptr)
         {
             app.HandleCommands(commands);
             return;

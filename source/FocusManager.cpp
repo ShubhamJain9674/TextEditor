@@ -12,7 +12,6 @@ void FocusManager::Update(std::vector<Command>& commands)
 {
     // handles only the latest mouse click event.
 
-
     for(int i = commands.size() - 1; i >=0 ; --i )
     {
         if(commands[i].type == CommandType::MOUSE_CLICK)
@@ -21,6 +20,7 @@ void FocusManager::Update(std::vector<Command>& commands)
             auto clickedElement = GetUnderMouseElement(c.mouseX,c.mouseY);
             HandleFocusChange(clickedElement);
             break;
+
         }
     }
 }
